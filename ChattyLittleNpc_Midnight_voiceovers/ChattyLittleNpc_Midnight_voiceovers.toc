@@ -1,8 +1,8 @@
-## Interface: 120000
+## Interface: 120001
 ## Title: Chatty Little NPC: Midnight
 ## Notes: This is a quest voiceover pack for Chatty Little NPC addon.
 ## Author: Tuubby
-## Version: 0.0.2
+## Version: 0.0.3
 ## Dependencies: ChattyLittleNPC
 
 Main.lua
