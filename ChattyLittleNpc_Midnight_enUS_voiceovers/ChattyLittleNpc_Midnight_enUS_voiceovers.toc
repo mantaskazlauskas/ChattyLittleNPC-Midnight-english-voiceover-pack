@@ -1,5 +1,5 @@
 ## Interface: 120105, 120100
-## Title: Chatty Little NPC: Midnight
+## Title: Chatty Little NPC: Midnight voiceovers (enUS)
 ## Notes: This is a quest voiceover pack for Chatty Little NPC addon.
 ## Author: Tuubby
 ## Version: 1.2.11

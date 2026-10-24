@@ -3,20 +3,23 @@
 Deploy script for WoW addon repos.
 Copies the addon folder into the selected WoW version's Interface/AddOns directory.
 
-Adapted from the ChattyLittleNpc deploy.py. The only change is that the addon
-folder is discovered by looking for a directory whose name matches a .toc file
-inside it, rather than being hardcoded -- so this file is now identical across
-repos and can be copied without edits.
+Adapted from the ChattyLittleNpc deploy.py. Addon folders are discovered by
+looking for a directory whose name matches a .toc file inside it, rather than
+being hardcoded. A voiceover repo can hold one addon folder per locale; the
+script asks which language to deploy (Enter = enUS), then which WoW version,
+then asks for confirmation.
 
 Usage:
     python deploy.py
 """
 
 import os
+import re
 import stat
 import sys
 import shutil
 
+# Maintainer's install path -- change this to wherever World of Warcraft is installed on your machine.
 WOW_ROOT = r"D:\Games\World of Warcraft"
 
 # Human-readable labels for known WoW version folders
@@ -32,13 +35,19 @@ VERSION_LABELS = {
 
 ADDONS_RELATIVE = os.path.join("Interface", "AddOns")
 
+# Voiceover packs are named <Addon>_<locale>_voiceovers (e.g. _enUS_, _deDE_); a pack
+# without a suffix is English (legacy naming).
+LOCALE_PACK_RE = re.compile(r'_([a-z]{2}[A-Z]{2})_voiceovers$')
+DEFAULT_LOCALE = "enUS"
 
-def find_addon_source():
+
+def find_addon_sources():
     """
-    Return the absolute path to the addon folder next to this script.
+    Return the absolute paths to the addon folders next to this script.
 
     An addon folder is a subdirectory containing <same-name>.toc, which is the
     layout WoW itself requires, so this cannot pick the wrong directory.
+    Voiceover repos may hold one addon folder per locale.
     """
     script_dir = os.path.dirname(os.path.abspath(__file__))
 
@@ -56,13 +65,45 @@ def find_addon_source():
         print("       e.g. ChattyLittleGossipTracker/ChattyLittleGossipTracker.toc")
         sys.exit(1)
 
-    if len(matches) > 1:
-        print("ERROR: More than one addon folder found:")
-        for m in matches:
-            print(f"       {os.path.basename(m)}")
-        sys.exit(1)
+    return matches
 
-    return matches[0]
+
+def get_locale(source):
+    """Locale of a voiceover pack folder, e.g. deDE; packs without a locale suffix are English."""
+    match = LOCALE_PACK_RE.search(os.path.basename(source))
+    return match.group(1) if match else DEFAULT_LOCALE
+
+
+def prompt_locale(sources):
+    """
+    Ask which language pack to deploy; Enter picks the English pack.
+    Returns a list of addon folders (all of them for 'a').
+    """
+    if len(sources) == 1:
+        return sources
+
+    default = next((i for i, s in enumerate(sources, start=1) if get_locale(s) == DEFAULT_LOCALE), 1)
+
+    print()
+    print("Available voiceover languages:")
+    print()
+    for i, source in enumerate(sources, start=1):
+        marker = "  (default)" if i == default else ""
+        print(f"  [{i}] {get_locale(source)}  {os.path.basename(source)}{marker}")
+    print("  [a] All of the above")
+    print()
+
+    while True:
+        raw = input(f"Select language [1-{len(sources)}, a, Enter = {get_locale(sources[default - 1])}]: ").strip().lower()
+        if raw == "":
+            return [sources[default - 1]]
+        if raw == "a":
+            return sources
+        if raw.isdigit():
+            choice = int(raw)
+            if 1 <= choice <= len(sources):
+                return [sources[choice - 1]]
+        print(f"  Please enter a number between 1 and {len(sources)}, 'a', or press Enter.")
 
 
 def discover_versions(wow_root):
@@ -134,10 +175,10 @@ def deploy(source_dir, addons_dir, addon_name):
 
 
 def main():
-    source_dir = find_addon_source()
-    addon_name = os.path.basename(source_dir)
+    source_dirs = prompt_locale(find_addon_sources())
 
-    print(f"Addon source : {source_dir}")
+    for source_dir in source_dirs:
+        print(f"Addon source : {source_dir}")
     print(f"WoW root     : {WOW_ROOT}")
 
     versions = discover_versions(WOW_ROOT)
@@ -147,13 +188,17 @@ def main():
 
     folder, addons_dir, label = prompt_version(versions)
 
-    print(f"\nDeploying to: {label}  ({addons_dir})")
+    print()
+    for source_dir in source_dirs:
+        print(f"Deploying   : {os.path.basename(source_dir)}  ({get_locale(source_dir)})")
+    print(f"Deploying to: {label}  ({addons_dir})")
     confirm = input("Confirm? [y/N]: ").strip().lower()
     if confirm != "y":
         print("Aborted.")
         sys.exit(0)
 
-    deploy(source_dir, addons_dir, addon_name)
+    for source_dir in source_dirs:
+        deploy(source_dir, addons_dir, os.path.basename(source_dir))
 
 
 if __name__ == "__main__":

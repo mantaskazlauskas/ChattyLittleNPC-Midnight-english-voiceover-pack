@@ -1,7 +1,7 @@
----@class ChattyLittleNpc_Midnight_voiceovers
-local ChattyLittleNpc_Midnight_voiceovers = _G["ChattyLittleNpc_Midnight_voiceovers"]
+---@class ChattyLittleNpc_Midnight_enUS_voiceovers
+local ChattyLittleNpc_Midnight_enUS_voiceovers = _G["ChattyLittleNpc_Midnight_enUS_voiceovers"]
 
-ChattyLittleNpc_Midnight_voiceovers.Voiceovers = {
+ChattyLittleNpc_Midnight_enUS_voiceovers.Voiceovers = {
     '119172_Gossip_17ab29e3be5b726282c6f8a5c57f45d3_Neutral.ogg',
     '119172_Gossip_17f42d861f2487a37be432f38ff5e9cd_Neutral.ogg',
     '119172_Gossip_31bd1b86aa9175d78402c5a382a2866a_Neutral.ogg',
@@ -7468,7 +7468,7 @@ ChattyLittleNpc_Midnight_voiceovers.Voiceovers = {
     '98836_Desc.ogg',
 }
 
-ChattyLittleNpc_Midnight_voiceovers.VoiceoverDurations = {
+ChattyLittleNpc_Midnight_enUS_voiceovers.VoiceoverDurations = {
     ["119172_Gossip_17ab29e3be5b726282c6f8a5c57f45d3_Neutral.ogg"] = 4.96,
     ["119172_Gossip_17f42d861f2487a37be432f38ff5e9cd_Neutral.ogg"] = 3.2,
     ["119172_Gossip_31bd1b86aa9175d78402c5a382a2866a_Neutral.ogg"] = 4.96,
