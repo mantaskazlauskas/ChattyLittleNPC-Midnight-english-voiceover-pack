@@ -17,7 +17,7 @@ try:
     from mutagen.oggvorbis import OggVorbis
     from mutagen.mp3 import MP3
 except ImportError:
-    print("Error: mutagen library is required. Install it with: pip install mutagen")
+    print("Error: mutagen library is required. Run: uv sync")
     exit(1)
 
 
